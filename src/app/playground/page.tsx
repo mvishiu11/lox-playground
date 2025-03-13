@@ -1,12 +1,13 @@
 "use client";
 
-import { Box, Button, Flex, Text, Textarea } from "@chakra-ui/react";
-import { Alert, Tabs, Accordion } from "@chakra-ui/react"; // or wherever these come from
 import { useState, useEffect, useRef } from "react";
+import { Box, Flex, Button, Text, Textarea } from "@chakra-ui/react";
+import { Alert, Tabs, Accordion } from "@chakra-ui/react";
+
 import LoxEditor from "@/components/monaco/Editor";
 import { CORELOX_EXAMPLES } from "@/data/coreloxExamples";
 
-
+// The same logic you had for splitting the output into bytecode vs runtime
 function splitOutput(completeOutput: string) {
   const lines = completeOutput.split("\n");
   const bytecodeLines: string[] = [];
@@ -38,12 +39,21 @@ function splitOutput(completeOutput: string) {
   };
 }
 
+interface RunHistoryItem {
+  timestamp: string;
+  elapsedMs: number;
+  status: number | null;
+}
+
 export default function PlaygroundPage() {
   const [code, setCode] = useState('// Try some CoreLox code...\nprint "Hello, Lox!";');
   const [bytecode, setBytecode] = useState("");
   const [runtimeOutput, setRuntimeOutput] = useState("");
   const [statusCode, setStatusCode] = useState<number | null>(null);
   const [wasmLoading, setWasmLoading] = useState(true);
+
+  // Store a history of runs with time, code, status, etc.
+  const [runHistory, setRunHistory] = useState<RunHistoryItem[]>([]);
 
   const coreloxRef = useRef<any>(null);
 
@@ -73,22 +83,37 @@ export default function PlaygroundPage() {
     }
 
     try {
+      // Measure start time
+      const start = performance.now();
       const retCode = coreloxRef.current.ccall("run_lox", "number", ["string"], [code]);
       setStatusCode(retCode);
 
       const fullOutput = coreloxRef.current.ccall("get_output", "string", [], []);
-      console.log("Full output:", fullOutput);
+      // End time, compute elapsed
+      const end = performance.now();
+      const elapsed = end - start;
 
-      // If success (statusCode == 0), do the normal split
+      // If success, split output
       if (retCode === 0) {
         const { bytecode, runtime } = splitOutput(fullOutput);
         setBytecode(bytecode);
         setRuntimeOutput(runtime);
       } else {
-        // If non-zero, show entire text in 'Result' tab
+        // If non-zero, show entire text in 'Result'
         setBytecode("");
         setRuntimeOutput(fullOutput);
       }
+
+      // Add to run history
+      const nowStr = new Date().toLocaleString();
+      setRunHistory((prev) => [
+        ...prev,
+        {
+          timestamp: nowStr,
+          elapsedMs: elapsed,
+          status: retCode,
+        },
+      ]);
     } catch (err: any) {
       setBytecode("");
       setRuntimeOutput(`Runtime error: ${err}`);
@@ -96,7 +121,7 @@ export default function PlaygroundPage() {
     }
   };
 
-  // Show a visual cue if statusCode != 0 or if wasm is loading
+  // Show a little visual cue if statusCode != 0 or if wasm is still loading
   let statusBanner = null;
   if (wasmLoading) {
     statusBanner = (
@@ -123,79 +148,46 @@ export default function PlaygroundPage() {
     }
   }
 
-  // For Examples
-  const loadExample = (exampleCode: string) => {
+  // Handle user clicking "Load Example"
+  const handleLoadExample = (exampleCode: string) => {
     setCode(exampleCode.trim());
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <Box p={6} maxWidth="1000px" mx="auto">
-      <Text fontSize="2xl" fontWeight="bold" mb={4}>
-        CoreLox Playground
-      </Text>
-
-      {statusBanner}
-
-      <Box borderWidth="1px" borderRadius="md" p={4} mb={4}>
-        <LoxEditor value={code} onChange={(value) => value && setCode(value)} />
-        <Flex justify="flex-end" mt={2}>
-          <Button colorScheme="blue" onClick={runCode} disabled={wasmLoading}>
-            Run
-          </Button>
-        </Flex>
-      </Box>
-
-      {/* Output Tabs */}
-      <Tabs.Root fitted variant="enclosed" colorScheme="blue" defaultValue={"result"}>
-        <Tabs.List mb="1em">
-          <Tabs.Trigger value="result">Result</Tabs.Trigger>
-          <Tabs.Trigger value="bytecode">Bytecode</Tabs.Trigger>
-        </Tabs.List>
-
-        {/* Result */}
-        <Tabs.Content value="result">
-          <Textarea
-            readOnly
-            height="200px"
-            resize="vertical"
-            placeholder="Runtime output will appear here..."
-            value={runtimeOutput}
-          />
-        </Tabs.Content>
-
-        {/* Bytecode */}
-        <Tabs.Content value="bytecode">
-          <Textarea
-            readOnly
-            height="200px"
-            resize="vertical"
-            placeholder="Bytecode disassembly will appear here..."
-            value={bytecode}
-          />
-        </Tabs.Content>
-
-      </Tabs.Root>
-
-      {/* Examples Section (Accordion) */}
-      <Box mt={8}>
-        <Text fontSize="xl" fontWeight="semibold" mb={2}>
+    <Flex height="calc(100vh - 80px)" /* or any size you want */ overflow="hidden">
+      {/* Left Panel: Examples */}
+      <Box
+        width="300px"
+        borderRight="1px solid"
+        borderColor="gray.200"
+        overflowY="auto"
+        p={4}
+      >
+        <Text fontSize="lg" fontWeight="semibold" mb={3}>
           Examples
         </Text>
-        <Accordion.Root collapsible defaultValue={["example-0"]}> 
+        <Accordion.Root type="multiple">
           {CORELOX_EXAMPLES.map((ex, idx) => (
-            <Accordion.Item key={idx} value={`example-${idx}`} mb={2} border="1px solid" borderColor="gray.200">
+            <Accordion.Item
+              key={idx}
+              value={`example-${idx}`}
+              mb={3}
+              border="1px solid"
+              borderColor="gray.200"
+              borderRadius="md"
+            >
               <Accordion.ItemTrigger>
-                <Flex align="center" justify="space-between" px={4} py={2}>
-                  <Text fontWeight="bold">{ex.title}</Text>
+                <Flex align="center" justify="space-between" px={3} py={2}>
+                  <Text fontWeight="bold" fontSize="sm">
+                    {ex.title}
+                  </Text>
                   <Accordion.ItemIndicator />
                 </Flex>
               </Accordion.ItemTrigger>
-
               <Accordion.ItemContent>
-                <Accordion.ItemBody px={4} py={2}>
+                <Accordion.ItemBody px={3} py={2}>
                   {ex.description && (
-                    <Text fontSize="sm" mb={2}>
+                    <Text fontSize="xs" mb={2}>
                       {ex.description}
                     </Text>
                   )}
@@ -204,13 +196,17 @@ export default function PlaygroundPage() {
                     p={2}
                     bg="gray.100"
                     borderRadius="md"
-                    mb={2}
-                    fontSize="sm"
+                    fontSize="xs"
                     whiteSpace="pre-wrap"
+                    mb={2}
                   >
                     {ex.code}
                   </Box>
-                  <Button size="sm" colorScheme="blue" onClick={() => loadExample(ex.code)}>
+                  <Button
+                    size="xs"
+                    colorScheme="blue"
+                    onClick={() => handleLoadExample(ex.code)}
+                  >
                     Load in Editor
                   </Button>
                 </Accordion.ItemBody>
@@ -219,6 +215,88 @@ export default function PlaygroundPage() {
           ))}
         </Accordion.Root>
       </Box>
-    </Box>
+
+      {/* Center: Editor, Output */}
+      <Box flex="1" p={4} overflowY="auto">
+        <Text fontSize="2xl" textAlign="center" fontWeight="bold" mb={4}>
+          CoreLox Playground
+        </Text>
+
+        {statusBanner}
+
+        <Box borderWidth="1px" borderRadius="md" p={4} mb={4}>
+          <LoxEditor
+            value={code}
+            onChange={(value) => value && setCode(value)}
+          />
+          <Flex justify="flex-end" mt={2}>
+            <Button colorScheme="blue" onClick={runCode} disabled={wasmLoading}>
+              Run
+            </Button>
+          </Flex>
+        </Box>
+
+        {/* Output Tabs */}
+        <Tabs.Root fitted variant="enclosed" colorScheme="blue" defaultValue={"result"}>
+          <Tabs.List mb="1em">
+            <Tabs.Trigger value="result">Result</Tabs.Trigger>
+            <Tabs.Trigger value="bytecode">Bytecode</Tabs.Trigger>
+          </Tabs.List>
+
+          <Tabs.Content value="bytecode">
+            <Textarea
+              readOnly
+              height="200px"
+              resize="vertical"
+              placeholder="Bytecode disassembly will appear here..."
+              value={bytecode}
+            />
+          </Tabs.Content>
+
+          <Tabs.Content value="result">
+            <Textarea
+              readOnly
+              height="200px"
+              resize="vertical"
+              placeholder="Runtime output will appear here..."
+              value={runtimeOutput}
+            />
+          </Tabs.Content>
+        </Tabs.Root>
+      </Box>
+
+      {/* Right Panel: Run History */}
+      <Box
+        width="250px"
+        borderLeft="1px solid"
+        borderColor="gray.200"
+        overflowY="auto"
+        p={4}
+      >
+        <Text fontSize="lg" fontWeight="semibold" mb={3}>
+          Run History
+        </Text>
+        {runHistory.map((item, idx) => (
+          <Box
+            key={idx}
+            mb={3}
+            p={2}
+            border="1px solid"
+            borderColor="gray.200"
+            borderRadius="md"
+            fontSize="sm"
+          >
+            <Text>Time: {item.timestamp}</Text>
+            <Text>Status: {item.status}</Text>
+            <Text>Exec: {item.elapsedMs.toFixed(2)} ms</Text>
+          </Box>
+        ))}
+        {runHistory.length === 0 && (
+          <Text fontSize="sm" color="gray.500">
+            No runs yet.
+          </Text>
+        )}
+      </Box>
+    </Flex>
   );
 }

@@ -44,5 +44,25 @@ export const CORELOX_EXAMPLES: CoreloxExample[] = [
   `,
       description: "Uses a while loop to print numbers 0 through 4."
     },
+    {
+      title: "For Loop",
+      code: `
+  for (var i = 0; i < 5; i = i + 1) {
+    print i;
+  }
+  `,
+      description: "Demonstrates a for-loop (syntactic sugar).",
+    },
+    {
+      title: "Factorial",
+      code: `
+  fun factorial(n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+  }
+  print factorial(5);
+  `,
+      description: "Computes factorial(5) = 120 with recursion.",
+    },
 ];
   
