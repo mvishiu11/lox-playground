@@ -1,103 +1,227 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import {
+  Box,
+  Button,
+  Heading,
+  Text,
+  Link as ChakraLink,
+  Stack,
+  Flex,
+  Image,
+  SimpleGrid,
+  Icon,
+  chakra
+} from "@chakra-ui/react";
+import { useColorModeValue } from "@/components/ui/color-mode";
+import { AiOutlineThunderbolt, AiOutlineControl, AiOutlineCode } from "react-icons/ai";
+import { MdMemory } from "react-icons/md";
+import NextLink from "next/link";
+
+export default function HomePage() {
+  // A gentle gradient background for visual pop
+  const bgGradient = useColorModeValue(
+    "linear(to-r, teal.50, teal.100)",
+    "linear(to-r, gray.700, gray.800)"
+  );
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <Box
+      as="main"
+      minH="100vh"
+      px={{ base: 4, md: 16 }}
+      py={{ base: 8, md: 16 }}
+      bgGradient={bgGradient}
+    >
+      {/* Hero Section */}
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        align="center"
+        justify="space-between"
+        mb={16}
+      >
+        {/* Left Side: Intro Text */}
+        <Box flex="1" mr={{ md: 8 }} mb={{ base: 8, md: 0 }}>
+          <Heading as="h1" size="2xl" mb={4}>
+            CoreLox & RustyLox Playground
+          </Heading>
+          <Text fontSize="lg" mb={4}>
+            Experience Lox interpretation “closer to the metal” with{" "}
+            <chakra.strong>CoreLox</chakra.strong>—a C-based bytecode interpreter
+            inspired by the{" "}
+            <ChakraLink
+              href="https://craftinginterpreters.com/"
+              target="_blank"
+              color="blue.500"
+              textDecoration="underline"
+            >
+              <strong>Crafting Interpreters</strong>
+            </ChakraLink>{" "}
+            book. Or explore the safety and clarity of our Rust-based sibling,
+            <chakra.strong> RustyLox</chakra.strong>. Both live in this unified
+            Playground, letting you run Lox code right in your browser!
+          </Text>
+          <Text fontSize="md" mb={6}>
+            While RustyLox provides memory safety and concurrency, CoreLox
+            strips things down to essentials—offering raw speed, minimal overhead,
+            and full manual memory management for a hands-on, “closer to the metal”
+            feel. Dive into either approach and discover the wonders of Lox.
+          </Text>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Stack direction="row" gap={4}>
+            <Button as={NextLink} href="/playground" colorScheme="teal" size="md">
+              Explore the Playground
+            </Button>
+            <Button
+              as={ChakraLink}
+              href="https://github.com/yourusername/lox-projects"
+              target="_blank"
+              variant="outline"
+              colorScheme="teal"
+              size="md"
+            >
+              GitHub Project
+            </Button>
+          </Stack>
+        </Box>
+
+        {/* Right Side: Hero Image */}
+        <Box flex="1" display="flex" alignItems="center" justifyContent="center">
+          <Image
+            src="/images/lox.jpeg"
+            alt="Lox Illustration"
+            borderRadius="md"
+            boxShadow="lg"
+            fallbackSrc="https://via.placeholder.com/400?text=CoreLox+RustyLox"
+          />
+        </Box>
+      </Flex>
+
+      {/* Features Section */}
+      <Box mb={16}>
+        <Heading as="h2" size="lg" mb={6}>
+          Key Features of CoreLox
+        </Heading>
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+          {/* Feature #1 */}
+          <Flex
+            p={5}
+            rounded="md"
+            bg={useColorModeValue("white", "gray.700")}
+            boxShadow="md"
+            align="center"
+            gap={4}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <Icon as={AiOutlineThunderbolt} boxSize={8} color="teal.500" />
+            <Box>
+              <Heading as="h3" size="md" mb={2}>
+                Bytecode Compilation
+              </Heading>
+              <Text fontSize="sm">
+                Transforms Lox code into bytecode instructions, processed at runtime
+                for swift, efficient execution.
+              </Text>
+            </Box>
+          </Flex>
+
+          {/* Feature #2 */}
+          <Flex
+            p={5}
+            rounded="md"
+            bg={useColorModeValue("white", "gray.700")}
+            boxShadow="md"
+            align="center"
+            gap={4}
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            <Icon as={MdMemory} boxSize={8} color="teal.500" />
+            <Box>
+              <Heading as="h3" size="md" mb={2}>
+                Manual Memory Management
+              </Heading>
+              <Text fontSize="sm">
+                Unlike RustyLox’s automated safety, CoreLox uses manual allocation
+                and resizing for fine-grained performance control.
+              </Text>
+            </Box>
+          </Flex>
+
+          {/* Feature #3 */}
+          <Flex
+            p={5}
+            rounded="md"
+            bg={useColorModeValue("white", "gray.700")}
+            boxShadow="md"
+            align="center"
+            gap={4}
+          >
+            <Icon as={AiOutlineCode} boxSize={8} color="teal.500" />
+            <Box>
+              <Heading as="h3" size="md" mb={2}>
+                Constants Pool
+              </Heading>
+              <Text fontSize="sm">
+                Literal values and variables kept in a dedicated array for speedy
+                lookups during runtime.
+              </Text>
+            </Box>
+          </Flex>
+
+          {/* Feature #4 */}
+          <Flex
+            p={5}
+            rounded="md"
+            bg={useColorModeValue("white", "gray.700")}
+            boxShadow="md"
+            align="center"
+            gap={4}
+          >
+            <Icon as={AiOutlineControl} boxSize={8} color="teal.500" />
+            <Box>
+              <Heading as="h3" size="md" mb={2}>
+                Streamlined VM
+              </Heading>
+              <Text fontSize="sm">
+                A single-threaded Virtual Machine that handles arithmetic,
+                comparisons, and function calls with minimal overhead.
+              </Text>
+            </Box>
+          </Flex>
+        </SimpleGrid>
+      </Box>
+
+      {/* Differences from RustyLox Section */}
+      <Box mb={16}>
+        <Heading as="h2" size="lg" mb={4}>
+          How Does CoreLox Differ from RustyLox?
+        </Heading>
+        <Text fontSize="md" mb={4}>
+          While RustyLox embraces Rust’s error handling and concurrency, CoreLox
+          takes a leaner approach, placing memory management in your hands. It's a
+          little riskier but a lot more flexible—and often faster.
+        </Text>
+        <Text fontSize="md">
+          With CoreLox, there’s no garbage collector or built-in concurrency model;
+          you decide when and how memory is allocated or freed. Ready to go “closer
+          to the metal”? Dive in.
+        </Text>
+      </Box>
+
+      {/* Additional Info Section */}
+      <Box>
+        <Heading as="h2" size="lg" mb={4}>
+          Getting Started
+        </Heading>
+        <Text fontSize="md" mb={4}>
+          Want to compile CoreLox from source? Check out the docs for build steps,
+          or head to the Playground for immediate Lox fun. Whether you prefer raw
+          speed or memory safety, we’ve got you covered.
+        </Text>
+        <Text fontSize="md">
+          <chakra.span fontWeight="bold">Ready to hack on CoreLox?</chakra.span>{" "}
+          Contribute on GitHub, share your improvements, or compare notes with
+          RustyLox. Let's build an even better Lox together!
+        </Text>
+      </Box>
+    </Box>
   );
 }
