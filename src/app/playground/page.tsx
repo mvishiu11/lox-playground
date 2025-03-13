@@ -4,40 +4,9 @@ import { Box, Button, Flex, Text, Textarea } from "@chakra-ui/react";
 import { Alert, Tabs, Accordion } from "@chakra-ui/react"; // or wherever these come from
 import { useState, useEffect, useRef } from "react";
 import LoxEditor from "@/components/monaco/Editor";
+import { CORELOX_EXAMPLES } from "@/data/coreloxExamples";
 
-// Simple example data
-const EXAMPLES = [
-  {
-    title: "Hello World",
-    code: `print "Hello from CoreLox!";`,
-    description: "A simple program that prints a greeting.",
-  },
-  {
-    title: "Fibonacci",
-    code: `
-fun fib(n) {
-  if (n < 2) return n;
-  return fib(n - 1) + fib(n - 2);
-}
-print fib(10);
-    `,
-    description: "A basic recursive Fibonacci implementation.",
-  },
-  {
-    title: "If / Else",
-    code: `
-var x = 5;
-if (x < 10) {
-  print "x is less than 10";
-} else {
-  print "x is 10 or more";
-}
-    `,
-    description: "Demonstrates basic conditional logic in Lox.",
-  },
-];
 
-// Original split logic for disassembly
 function splitOutput(completeOutput: string) {
   const lines = completeOutput.split("\n");
   const bytecodeLines: string[] = [];
@@ -214,7 +183,7 @@ export default function PlaygroundPage() {
           Examples
         </Text>
         <Accordion.Root collapsible defaultValue={["example-0"]}> 
-          {EXAMPLES.map((ex, idx) => (
+          {CORELOX_EXAMPLES.map((ex, idx) => (
             <Accordion.Item key={idx} value={`example-${idx}`} mb={2} border="1px solid" borderColor="gray.200">
               <Accordion.ItemTrigger>
                 <Flex align="center" justify="space-between" px={4} py={2}>
