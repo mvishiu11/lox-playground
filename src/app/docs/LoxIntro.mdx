@@ -1,0 +1,236 @@
+# **CoreLox Tutorial: Lox Meets C, Head-On**
+
+Welcome to **CoreLox**, your gateway to a minimalist, bytecode-driven Lox interpreter written in C. If you’ve ever wanted to see how a language like Lox works “closer to the metal,” you’re in the right place.
+
+## **1. Why CoreLox?**
+
+In a world where high-level safety nets (like Rust’s) can shield you from the finer details of memory management, CoreLox strips everything down to the essentials—giving you direct control over every byte. Lox itself is a small, elegant language taught in the seminal [*Crafting Interpreters*](https://craftinginterpreters.com/) book. By building it in C, we get:
+
+- A **bytecode** approach that compiles Lox scripts before executing them.
+- Manual memory management for those who want to get their hands dirty with pointers and buffers.
+- A single-threaded, streamlined VM that focuses on performance and simplicity.
+
+If RustyLox is the safe, robust older sibling, CoreLox is the thrill-seeking younger one, designed for speed and maximum control.
+
+---
+
+## **2. Lox Quick Start**
+
+Lox is a dynamically typed language with a JavaScript-like syntax. A “Hello, World!” in CoreLox might look like this:
+
+```lox
+print "Hello from CoreLox!";
+```
+
+Simple enough, right? Under the hood, CoreLox compiles this single statement into **bytecode** and hands it to a small but powerful **virtual machine** that runs your code instruction by instruction.
+
+### 2.1 Installing CoreLox
+
+1. **Clone the repo**:
+   ```bash
+   git clone https://github.com/yourusername/carbonlox.git
+   cd carbonlox
+   ```
+2. **Build the project**:
+   ```bash
+   make
+   ```
+3. **Run a file**:
+   ```bash
+   ./carbonlox path/to/your_file.lox
+   ```
+
+If everything worked, you’ll see the output right in your terminal.
+
+> **Tip**: If you want to dig deeper into how each chunk of bytecode is formed or how memory is managed, keep reading—CoreLox exposes it all!
+
+---
+
+## **3. Under the Hood: Bytecode & Chunks**
+
+CoreLox compiles your Lox code into a series of **Chunks**. Each chunk is an array of instructions (bytecode) representing operations like arithmetic, control flow (e.g., `if`, `while`), or function calls. Think of it like a mini assembly language just for Lox.
+
+### 3.1 Compilation
+
+When you run:
+
+```lox
+var x = 3;
+print x + 1;
+```
+
+CoreLox’s **compiler** parses that into an abstract syntax tree, then emits bytecode instructions for:
+
+1. Declaring a variable.  
+2. Loading the value `3`.  
+3. Adding `1`.  
+4. Printing the result.
+
+### 3.2 Memory Management (Chunks)
+
+Unlike in Rust, where the compiler ensures memory safety automatically, C puts you in the driver’s seat. **CoreLox** uses macros like `GROW_ARRAY` or `FREE_ARRAY` to expand or shrink memory for chunks on demand. That means if your Lox script grows large or loops a lot, CoreLox re-allocates arrays for you. But it’s up to you (the developer maintaining CoreLox’s code) to ensure no memory leaks slip through.
+
+> **Why is that interesting?**  
+> Because you can see exactly how much memory you’re using, and you can optimize or debug any overhead. It’s a bit dangerous, but also empowering, especially if you want to learn how a language runtime manages data.
+
+---
+
+## **4. The Virtual Machine**
+
+Once CoreLox has your bytecode, it hands it off to a **single-threaded virtual machine (VM)**. This VM does the heavy lifting: reading each instruction, updating a stack of values, and performing operations like `+`, `-`, or function calls. It’s simple, but that simplicity is its strength.
+
+### 4.1 How It Runs
+
+1. **Load Bytecode**: The VM takes your compiled chunk(s).
+2. **Push & Pop**: Most instructions revolve around a **stack** (LIFO structure). For example, to add two numbers, CoreLox pushes them on the stack, executes an `OP_ADD`, and pushes the result back.
+3. **Control Flow**: `if` statements and loops become jump instructions (`OP_JUMP`, `OP_LOOP`) that move the VM’s instruction pointer around within the chunk.
+4. **Print**: When you write `print x;`, it’s actually an `OP_PRINT` bytecode that prints the top of the stack.
+
+### 4.2 Single-Threaded
+
+No concurrency means fewer headaches with race conditions or synchronization. **One** chunk, **one** stack, **one** thread. If you want concurrency, check out RustyLox—but if raw speed and direct control are your jam, CoreLox is enough to keep you busy.
+
+---
+
+## **5. Lox Grammar & Language Basics**
+
+CoreLox implements the **Lox** grammar below, so you can use variables, loops, conditionals, and more. Here’s the gist, in simplified EBNF:
+
+```ebnf
+program      = { declaration }, EOF ;
+
+declaration  = varDecl 
+             | funDecl
+             | statement ;
+
+funDecl      = "fun", function ;
+function     = IDENTIFIER, "(", [ parameters ], ")", block ;
+
+varDecl      = "var", IDENTIFIER, [ "=" expression ], ";" ;
+
+statement    = exprStmt 
+             | forStmt
+             | ifStmt
+             | printStmt 
+             | returnStmt
+             | whileStmt
+             | switchStmt
+             | block 
+             | breakStmt
+             | continueStmt ;
+
+... (See full grammar in the docs) ...
+```
+
+### 5.1 Examples
+
+**Variables**:
+
+```lox
+var message = "Hello";
+print message;
+```
+
+**Loops**:
+
+```lox
+var i = 0;
+while (i < 5) {
+  print i;
+  i = i + 1;
+}
+```
+
+**Functions**:
+
+```lox
+fun greet(name) {
+  print "Hello, " + name;
+}
+greet("World");
+```
+
+Everything above is parsed and turned into bytecode. If you want to see the raw instructions, you can enable debug flags in the CoreLox code to watch it compile.
+
+---
+
+## **6. Differences from RustyLox**
+
+Why might you choose **CoreLox** over RustyLox (or vice versa)? In short:
+
+- **Memory Management**: RustyLox uses Rust’s ownership model; CoreLox does it by hand with `malloc` and `realloc`.
+- **Concurrency**: RustyLox can leverage Rust’s concurrency features; CoreLox is single-threaded for raw speed and minimal overhead.
+- **Error Handling**: Rust’s built-in error handling vs. custom checks in C.  
+- **Performance**: CoreLox typically compiles and executes faster because it’s not going through Rust’s layer, though it also depends on your system.
+
+If you’re intrigued by building a language runtime that doesn’t hide anything from you, **CoreLox** is your playground.
+
+---
+
+## **7. Getting Started with CoreLox**
+
+### 7.1 Prerequisites
+
+- A C compiler (e.g., `gcc`, `clang`)  
+- `make` for building the project  
+- Basic knowledge of C memory handling if you plan to hack on the interpreter itself
+
+### 7.2 Building from Source
+
+Clone the repo, navigate into it, then run `make`:
+
+```bash
+git clone https://github.com/yourusername/carbonlox.git
+cd carbonlox
+make
+```
+
+This produces a binary named `carbonlox` (or something similar).
+
+### 7.3 Running a Lox Script
+
+Create a file, say `hello.lox`:
+
+```lox
+print "Hello from a script!";
+```
+
+Now run:
+
+```bash
+./carbonlox hello.lox
+```
+
+You should see:
+
+```
+Hello from a script!
+```
+
+If you want to step into the internals, you can compile with debug flags to watch the chunk creation, memory usage, and more.
+
+---
+
+## **8. Contributing**
+
+CoreLox is all about community-driven exploration. Whether you’re adding a new feature (maybe you want `++` increments?), fixing a bug, or optimizing memory usage, we’d love your help!
+
+1. **Fork**: Start by forking the repo on GitHub.  
+2. **Branch & Code**: Create a feature branch and hack away.  
+3. **Pull Request**: Submit your changes with a clear description—why you made them, how they help.
+
+Feel free to add custom opcodes or experiment with concurrency (though that’s a big step!). Remember, with C, you hold the keys to memory and performance.
+
+---
+
+## **9. Conclusion: Forge Ahead!**
+
+CoreLox opens the door to understanding how a language runs at a low level. If RustyLox is a calm, stable ride, CoreLox is a thrilling motorcycle—powerful, agile, but putting more responsibility in your hands.
+
+- **Bytecode** approach means Lox gets compiled before it’s run.  
+- **Manual memory** means you can see exactly what’s happening under the hood.  
+- **Single-threaded VM** focuses on simplicity and speed.
+
+Use the Lox grammar to build your own scripts, or fork CoreLox to add features you’ve always dreamt about. There’s room to innovate, experiment, and—yes—maybe break a few pointers along the way.
+
+**Happy coding**—and may the raw power of C be with you as you explore the metal-forged world of **CoreLox**!

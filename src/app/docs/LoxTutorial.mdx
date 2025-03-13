@@ -1,0 +1,253 @@
+# **CoreLox Language Overview**
+
+CoreLox implements a **minimal yet powerful** subset of Lox. You can declare variables, write functions, run loops, do conditionals, and more. Below, we’ll walk through the **key keywords and constructs** you’ll use day to day.
+
+---
+
+## 1. **Variables: `var`**
+
+Use `var` to declare a variable. You can optionally initialize it:
+
+```lox
+var x = 10;
+print x; // 10
+
+var y;    // declared, but defaults to nil if not assigned
+y = 42;
+print y; // 42
+```
+
+In CoreLox, variables are dynamically typed—so you can store strings, numbers, booleans, or even function references in them.
+
+---
+
+## 2. **Functions: `fun`**
+
+Define a function with `fun`, followed by a name and parameter list. The **function** body is a **block** enclosed in braces:
+
+```lox
+fun greet(name) {
+  print "Hello, " + name;
+}
+
+greet("World"); // prints "Hello, World"
+```
+
+Inside function bodies, you can declare locals with `var`, call other functions, etc. All parameters are passed by value. You can `return` from anywhere in the function (see below).
+
+---
+
+## 3. **If / Elif / Else: `if`, `elif`, `else`**
+
+**CoreLox** allows more flexible conditionals than some Lox variants, thanks to `elif`. The standard form is:
+
+```lox
+if (condition) {
+  // ...
+} elif (anotherCondition) {
+  // ...
+} else {
+  // ...
+}
+```
+
+You can nest these however you like:
+
+```lox
+var x = 15;
+if (x < 10) {
+  print "x is under 10";
+} elif (x < 20) {
+  print "x is under 20";
+} else {
+  print "x is 20 or more";
+}
+```
+
+> **Tip**: `elif` is basically `else if` but more convenient in some syntax rules.
+
+---
+
+## 4. **While Loops: `while`**
+
+Loop while a condition is true. Usually you’ll increment a variable:
+
+```lox
+var i = 0;
+while (i < 3) {
+  print "i is " + i;
+  i = i + 1;
+}
+```
+
+---
+
+## 5. **For Loops: `for`**
+
+CoreLox also supports a C-style `for` statement. The EBNF reveals something like:
+
+```lox
+for (var i = 0; i < 5; i = i + 1) {
+  print i;
+}
+```
+
+Under the hood, this desugars to a mix of **variable declaration**, **while** checks, and **increment** steps. But it’s more convenient for short loops.
+
+---
+
+## 6. **Print: `print`**
+
+The simplest I/O Lox provides out of the box. Just:
+
+```lox
+print "Hello from Lox!";
+```
+
+This compiles to bytecode, calling an internal `OP_PRINT` instruction in CoreLox. Perfect for debugging or casual output.
+
+---
+
+## 7. **Switch / Case / Default: `switch`, `case`, `default`**
+
+CoreLox extends standard Lox with a `switch` statement, letting you compare an expression against multiple **cases**:
+
+```lox
+var fruit = "apple";
+
+switch (fruit) {
+  case "apple":
+    print "You picked an apple.";
+    // "fall" if you want to continue to next case
+  case "banana":
+    print "You picked a banana.";
+  default:
+    print "Unknown fruit.";
+}
+```
+
+If a **default** case is present, it runs if no other case matches. You can also use `fall` in a case to “fall through” to the next case.
+
+---
+
+## 8. **Blocks: `{ ... }`**
+
+Whenever you see a block, it means a **new scope** for variables. This is the same block style you see in C/Java:
+
+```lox
+{
+  var temp = 99;
+  print temp; // 99
+}
+print temp; // error, temp not defined here
+```
+
+Blocks are used in functions, if statements, loops, etc.
+
+---
+
+## 9. **Break / Continue: `break`, `continue`**
+
+Inside loops (like `while` or `for`), you can **exit** or **skip** the remainder of the loop body:
+
+- `break;` ends the loop immediately.
+- `continue;` jumps to the next iteration.
+
+```lox
+for (var i = 0; i < 10; i = i + 1) {
+  if (i == 3) break;
+  if (i == 1) continue;
+  print i;
+}
+// prints 0, 2, stops at 3
+```
+
+---
+
+## 10. **Return: `return`**
+
+Use `return` in a function to pass a value back. If you omit it, the function returns `nil` by default.
+
+```lox
+fun double(n) {
+  return n * 2;
+}
+var result = double(10);
+print result; // 20
+```
+
+You can also do `return;` with no value, which implies `nil`.
+
+---
+
+## 11. **Expressions & Operators**
+
+Although not a “keyword,” the Lox grammar references a variety of expressions:
+
+- Arithmetic: `+`, `-`, `*`, `/`, `%`
+- Logical: `and`, `or`, `!`
+- Comparison: `>`, `>=`, `<`, `<=`, `==`, `!=`
+
+**Example**:
+
+```lox
+print (10 + 2) * 3; // 36
+print !true;        // false
+print 5 == 5;       // true
+```
+
+You can nest expressions in parentheses or pass them as arguments.
+
+---
+
+## 12. **Putting It All Together**
+
+Here’s a small script that uses **several** keywords:
+
+```lox
+var size = 5;
+
+fun factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+
+for (var i = 1; i <= size; i = i + 1) {
+  print i + "! = " + factorial(i);
+}
+```
+
+**What’s happening?**  
+
+1. We declare `size = 5`.  
+2. Define a function `factorial(n)`.  
+3. Use a `for` loop from 1 to 5, printing each factorial.  
+
+You’ll see output:
+
+```
+1! = 1
+2! = 2
+3! = 6
+4! = 24
+5! = 120
+```
+
+---
+
+## **Summary**
+
+These are the **building blocks** of Lox as implemented in **CoreLox**. You’ve got:
+
+- **`var`** for variables  
+- **`fun`** for functions  
+- **`if/elif/else`** for conditionals  
+- **`while`, `for`** for loops  
+- **`print`** for output  
+- **`switch/case/default`** for branch logic  
+- **`break`, `continue`** for controlling loops  
+- **`return`** for function results  
+
+From arithmetic expressions to blocks, from function calls to advanced flow control, Lox offers a flexible, readable syntax. And **CoreLox** compiles it all down to blazing-fast bytecode, run on a single-threaded VM you can study or modify at will.
+
+Experiment with these keywords in the playground, or dive into CoreLox’s source to see how each one becomes an **opcode**. Whether you’re brand new to Lox or a seasoned C programmer, we hope this “language tour” helps you get started writing your own programs in **CoreLox**!

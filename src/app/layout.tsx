@@ -2,8 +2,8 @@ import { Provider } from "@/components/ui/provider";
 import Navbar from "@/components/Navbar";
 
 export const metadata = {
-  title: "My Next.js 13 App",
-  description: "Using Chakra with Providers pattern",
+  title: "Lox Playground",
+  description: "Playground and docs for Lox language",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <Provider>
           <Navbar />

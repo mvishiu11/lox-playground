@@ -1,12 +1,17 @@
 "use client";
+
 import React from "react";
-import { Provider } from "./ui/provider";
-import { Box } from "@chakra-ui/react";
+import { Provider } from "@/components/ui/provider";
+import { MDXProvider } from "@mdx-js/react";
 
 export default function ClientMDXLayout({ children }: { children: React.ReactNode }) {
   return (
     <Provider>
-      <Box p={4}>{children}</Box>
+      <div className="markdown-body">
+        <MDXProvider>
+          {children}
+        </MDXProvider>
+      </div>
     </Provider>
   );
 }
