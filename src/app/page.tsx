@@ -43,7 +43,7 @@ export default function HomePage() {
         {/* Left Side: Intro Text */}
         <Box flex="1" mr={{ md: 8 }} mb={{ base: 8, md: 0 }}>
           <Heading as="h1" size="2xl" mb={4}>
-            CoreLox & RustyLox Playground
+            CoreLox Playground
           </Heading>
           <Text fontSize="lg" mb={4}>
             Experience Lox interpretation “closer to the metal” with{" "}
@@ -57,24 +57,26 @@ export default function HomePage() {
             >
               <strong>Crafting Interpreters</strong>
             </ChakraLink>{" "}
-            book. Or explore the safety and clarity of our Rust-based sibling,
-            <chakra.strong> RustyLox</chakra.strong>. Both live in this unified
+            book. It lives right here in this
             Playground, letting you run Lox code right in your browser!
           </Text>
           <Text fontSize="md" mb={6}>
             While RustyLox provides memory safety and concurrency, CoreLox
             strips things down to essentials—offering raw speed, minimal overhead,
             and full manual memory management for a hands-on, “closer to the metal”
-            feel. Dive into either approach and discover the wonders of Lox.
+            feel. Dive into this new way and discover the wonders of Lox.
           </Text>
 
           <Stack direction="row" gap={4}>
             <Button as={NextLink} href="/playground" colorScheme="teal" size="md">
               Explore the Playground
             </Button>
+            <Button as={NextLink} href="/docs" colorScheme="teal" size="md">
+              See the Docs
+            </Button>
             <Button
               as={ChakraLink}
-              href="https://github.com/yourusername/lox-projects"
+              href="https://github.com/mvishiu11/CoreLox"
               target="_blank"
               variant="outline"
               colorScheme="teal"
