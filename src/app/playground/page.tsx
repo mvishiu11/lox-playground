@@ -94,6 +94,9 @@ export default function PlaygroundPage() {
     }
 
     try {
+      // Clear previous output
+      coreloxRef.current.ccall("clear_output", "void", [], []);
+      
       // Measure start time
       const start = performance.now();
       const retCode = coreloxRef.current.ccall("run_lox", "number", ["string"], [code]);
