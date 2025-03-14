@@ -12,7 +12,6 @@ import {
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import LoxEditor from "@/components/monaco/Editor";
 
 
 export default function DocsPage() {
@@ -53,7 +52,6 @@ export default function DocsPage() {
                 <ChakraLink
                   href="https://craftinginterpreters.com/"
                   color="teal.500"
-                  isExternal
                   textDecoration="underline"
                 >
                   <em>Crafting Interpreters</em>
@@ -90,7 +88,7 @@ export default function DocsPage() {
 
               <Box mb={4}>
                 <Code as="pre" p={3} bg="gray.100" borderRadius="md" overflowX="auto">
-                  print "Hello from CoreLox!";
+                  print &quot;Hello from CoreLox!&quot;;
                 </Code>
               </Box>
 
@@ -316,7 +314,7 @@ primary      = NUMBER
                 <List.Item>Have a C compiler (gcc/clang) + make</List.Item>
                 <List.Item>Clone &amp; <Code>make</Code></List.Item>
                 <List.Item>
-                  Write Lox code <Code>print "Hello"</Code>, then run <Code>./corelox</Code>
+                  Write Lox code <Code>print &quot;Hello&quot;</Code>, then run <Code>./corelox</Code>
                 </List.Item>
               </List.Root>
 

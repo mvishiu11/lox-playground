@@ -16,10 +16,9 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { AiOutlineThunderbolt, AiOutlineControl, AiOutlineCode } from "react-icons/ai";
 import { MdMemory } from "react-icons/md";
-import NextLink from "next/link";
+import Link from "next/link";
 
 export default function HomePage() {
-  // A gentle gradient background for visual pop
   const bgGradient = useColorModeValue(
     "linear(to-r, teal.50, teal.100)",
     "linear(to-r, gray.700, gray.800)"
@@ -68,22 +67,25 @@ export default function HomePage() {
           </Text>
 
           <Stack direction="row" gap={4}>
-            <Button as={NextLink} href="/playground" colorScheme="teal" size="md">
-              Explore the Playground
-            </Button>
-            <Button as={NextLink} href="/docs" colorScheme="teal" size="md">
-              See the Docs
-            </Button>
-            <Button
-              as={ChakraLink}
-              href="https://github.com/mvishiu11/CoreLox"
-              target="_blank"
-              variant="outline"
-              colorScheme="teal"
-              size="md"
-            >
-              GitHub Project
-            </Button>
+            <Link href="/playground">
+              <Button colorScheme="teal" size="md">
+                Explore the Playground
+              </Button>
+            </Link>
+            <Link href="/docs">
+              <Button colorScheme="teal" size="md">
+                See the Docs
+              </Button>
+            </Link>
+            <Link href="https://github.com/mvishiu11/CoreLox" target="_blank">
+              <Button
+                variant="outline"
+                colorScheme="teal"
+                size="md"
+              >
+                GitHub Project
+              </Button>
+            </Link>
           </Stack>
         </Box>
 
@@ -94,7 +96,6 @@ export default function HomePage() {
             alt="Lox Illustration"
             borderRadius="md"
             boxShadow="lg"
-            fallbackSrc="https://via.placeholder.com/400?text=CoreLox+RustyLox"
           />
         </Box>
       </Flex>
@@ -104,7 +105,7 @@ export default function HomePage() {
         <Heading as="h2" size="lg" mb={6}>
           Key Features of CoreLox
         </Heading>
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+        <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
           {/* Feature #1 */}
           <Flex
             p={5}
@@ -198,7 +199,7 @@ export default function HomePage() {
         </Heading>
         <Text fontSize="md" mb={4}>
           While RustyLox embraces Rust’s error handling and concurrency, CoreLox
-          takes a leaner approach, placing memory management in your hands. It's a
+          takes a leaner approach, placing memory management in your hands. It&apos;s a
           little riskier but a lot more flexible—and often faster.
         </Text>
         <Text fontSize="md">
@@ -216,12 +217,12 @@ export default function HomePage() {
         <Text fontSize="md" mb={4}>
           Want to compile CoreLox from source? Check out the docs for build steps,
           or head to the Playground for immediate Lox fun. Whether you prefer raw
-          speed or memory safety, we’ve got you covered.
+          speed or memory safety, we&apos;ve got you covered.
         </Text>
         <Text fontSize="md">
           <chakra.span fontWeight="bold">Ready to hack on CoreLox?</chakra.span>{" "}
           Contribute on GitHub, share your improvements, or compare notes with
-          RustyLox. Let's build an even better Lox together!
+          RustyLox. Let&apos;s build an even better Lox together!
         </Text>
       </Box>
     </Box>

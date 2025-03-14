@@ -7,7 +7,20 @@ import { Alert, Tabs, Accordion } from "@chakra-ui/react";
 import LoxEditor from "@/components/monaco/Editor";
 import { CORELOX_EXAMPLES } from "@/data/coreloxExamples";
 
-// The same logic you had for splitting the output into bytecode vs runtime
+interface CoreLoxModule {
+  ccall: (
+    funcName: string,
+    returnType: string,
+    argTypes: string[],
+    args: unknown[]
+  ) => number | string;
+  cwrap: (
+    funcName: string,
+    returnType: string,
+    argTypes: string[]
+  ) => unknown;
+}
+
 function splitOutput(completeOutput: string) {
   const lines = completeOutput.split("\n");
   const bytecodeLines: string[] = [];
@@ -52,18 +65,16 @@ export default function PlaygroundPage() {
   const [statusCode, setStatusCode] = useState<number | null>(null);
   const [wasmLoading, setWasmLoading] = useState(true);
 
-  // Store a history of runs with time, code, status, etc.
   const [runHistory, setRunHistory] = useState<RunHistoryItem[]>([]);
 
-  const coreloxRef = useRef<any>(null);
+  const coreloxRef = useRef<CoreLoxModule | null>(null);
 
-  // Load the Emscripten module (CoreLox) once
   useEffect(() => {
     (async () => {
       try {
         const coreloxModule = await import("@/lib/wasm/corelox.mjs");
         const instance = await coreloxModule.default({
-          locateFile: (file) => "/wasm/" + file, // e.g. /wasm/corelox.wasm
+          locateFile: (file: string) => "/wasm/" + file,
         });
         coreloxRef.current = instance;
       } catch (err) {
@@ -86,7 +97,7 @@ export default function PlaygroundPage() {
       // Measure start time
       const start = performance.now();
       const retCode = coreloxRef.current.ccall("run_lox", "number", ["string"], [code]);
-      setStatusCode(retCode);
+      setStatusCode(retCode as number);
 
       const fullOutput = coreloxRef.current.ccall("get_output", "string", [], []);
       // End time, compute elapsed
@@ -95,13 +106,13 @@ export default function PlaygroundPage() {
 
       // If success, split output
       if (retCode === 0) {
-        const { bytecode, runtime } = splitOutput(fullOutput);
+        const { bytecode, runtime } = splitOutput(fullOutput as string);
         setBytecode(bytecode);
         setRuntimeOutput(runtime);
       } else {
         // If non-zero, show entire text in 'Result'
         setBytecode("");
-        setRuntimeOutput(fullOutput);
+        setRuntimeOutput(fullOutput as string);
       }
 
       // Add to run history
@@ -111,10 +122,10 @@ export default function PlaygroundPage() {
         {
           timestamp: nowStr,
           elapsedMs: elapsed,
-          status: retCode,
+          status: retCode as number,
         },
       ]);
-    } catch (err: any) {
+    } catch (err) {
       setBytecode("");
       setRuntimeOutput(`Runtime error: ${err}`);
       setStatusCode(null);
@@ -166,7 +177,7 @@ export default function PlaygroundPage() {
         <Text fontSize="lg" fontWeight="semibold" mb={3}>
           Examples
         </Text>
-        <Accordion.Root type="multiple">
+        <Accordion.Root defaultValue={[`example-0`]}>
           {CORELOX_EXAMPLES.map((ex, idx) => (
             <Accordion.Item
               key={idx}
